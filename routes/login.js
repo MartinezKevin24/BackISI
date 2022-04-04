@@ -14,7 +14,7 @@ const connectionBD = mysql.createConnection({
 router.post("/", function (req, res, next) {
   const { email, password, table } = req.body;
 
-  var sql = `SELECT id,email,password FROM ${table} WHERE email='${email}'`;
+  var sql = `SELECT * FROM ${table} WHERE email='${email}'`;
   connectionBD.query(sql, function (error, results) {
     if (error) {
       throw error;
@@ -28,7 +28,7 @@ router.post("/", function (req, res, next) {
           res.send('Not Logged, password incorrect');
         } else {
           console.log("Logged correctamente");
-          res.send("Logged");
+          res.send("Welcome "+results[0].nombres);
         }
       }
     }
