@@ -21,10 +21,11 @@ router.post("/", function (req, res, next) {
     } else {
       if (results[0] == null) {
         console.log("Correo o contraseña incorrecta2");
+        res.send('Not logged, email incorrect')
       } else if (results[0].email == email) {
         if (bcrypt.compareSync(password, results[0].password) == false) {
           console.log("Correo o contraseña incorrecta1");
-          res.send("Not Logged");
+          res.send('Not Logged, password incorrect');
         } else {
           console.log("Logged correctamente");
           res.send("Logged");
