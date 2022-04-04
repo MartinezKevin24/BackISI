@@ -5,23 +5,12 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mysql = require('mysql');
 
-const connectionBD = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'personal'
-});
 
-connectionBD.connect((err)=>{
-  if(err){
-    throw err;
-  }else{
-    console.log("Conectado a la BD")
-  }
-});
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
+const registerRouter=require('./routes/register');
+const loginRouter=require('./routes/login');
 
 const app = express();
 
@@ -35,8 +24,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// rutas de las peticiones
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/register', registerRouter);
+app.use('/login', loginRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -54,4 +46,9 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+app.listen(8080, ()=>{
+  
+  console.log('Conectado al servidor');
+  
+});
 module.exports = app;
