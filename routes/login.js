@@ -14,6 +14,8 @@ const connectionBD = mysql.createConnection({
 router.post("/", function (req, res, next) {
   const { email, password, table } = req.body;
 
+  console.log(req.body);
+
   var sql = `SELECT * FROM ${table} WHERE email='${email}'`;
   connectionBD.query(sql, function (error, results) {
     if (error) {
@@ -21,14 +23,14 @@ router.post("/", function (req, res, next) {
     } else {
       if (results[0] == null) {
         console.log("Correo o contraseña incorrecta2");
-        res.send('Not logged, email incorrect')
+        res.send({message: 'Not logged, email or password incorrect', success: false})
       } else if (results[0].email == email) {
         if (bcrypt.compareSync(password, results[0].password) == false) {
           console.log("Correo o contraseña incorrecta1");
-          res.send('Not Logged, password incorrect');
+          res.send({message: 'Not Logged, email or password incorrect', success: false});
         } else {
-          console.log("Logged correctamente");
-          res.send("Welcome "+results[0].nombres);
+          console.log({message: "Logged correctamente", success: true});
+          res.send({message: "Welcome "+results[0].nombres, success: true});
         }
       }
     }
