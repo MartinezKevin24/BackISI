@@ -4,8 +4,12 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mysql = require('mysql');
+const cors = require('cors');
 
-
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -18,6 +22,7 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+app.use(cors(corsOptions))
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

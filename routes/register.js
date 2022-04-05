@@ -29,6 +29,7 @@ router.post("/client", async function (req, res, next) {
     fechaNacimiento,
     password,
     puntuacion,
+    phone
   } = req.body;
 
   var sql = `SELECT id,email FROM clientes WHERE id='${id}' OR email='${email}'`;
@@ -39,9 +40,9 @@ router.post("/client", async function (req, res, next) {
       if (results[0] == null) {
         band = 1;
         password = bcrypt.hashSync(password, 10);
-        var sql = `INSERT INTO clientes (id,email,tipo_documento,nombres,apellidos,fecha_nacimiento,password,puntuacion)
+        var sql = `INSERT INTO clientes (id,email,tipo_documento,nombres,apellidos,fecha_nacimiento,password,puntuacion,phone)
         VALUES ('${id}','${email}','${tipoDoc}','${nombres}','${apellidos}','${fechaNacimiento}',
-        '${password}',${puntuacion})`;
+        '${password}',${puntuacion}, ${phone})`;
         connectionBD.query(sql, function (error, results) {
           if (error) {
             console.log(error);
@@ -75,6 +76,7 @@ router.post("/worker", async function (req, res, next) {
     tipoServicio,
     tarifaHora,
     puntuacion,
+    phone
   } = req.body;
 
   var sql = `SELECT id,email FROM trabajadores WHERE id='${id}' OR email='${email}'`;
@@ -85,28 +87,26 @@ router.post("/worker", async function (req, res, next) {
       if (results[0] == null) {
         band = 1;
         password = bcrypt.hashSync(password, 10);
-        var sql = `INSERT INTO trabajadores (id,email,tipo_documento,nombres,apellidos,fecha_nacimiento,password,tipo_servicio,tarifa_hora,puntuacion)
+        var sql = `INSERT INTO trabajadores (id,email,tipo_documento,nombres,apellidos,fecha_nacimiento,password,tipo_servicio,tarifa_hora,puntuacion,phone)
         VALUES ('${id}','${email}','${tipoDoc}','${nombres}','${apellidos}','${fechaNacimiento}',
-        '${password}','${tipoServicio}',${tarifaHora},${puntuacion})`;
+        '${password}','${tipoServicio}',${tarifaHora},${puntuacion}, ${phone})`;
         connectionBD.query(sql, function (error, results) {
           if (error) {
             console.log(error);
           } else {
-            res.send("Registro exitoso");
+            res.send({res: "Registro exitoso", success: true});
             console.log("Registro exitoso");
           }
         });
       } else if (results[0].email == email) {
-        band = 2;
-        console.log("test");
-        res.send("Usario ya registrado");
+        console.log("Usario ya registrado");
+        res.send({res: "Usario ya registrado", success: false});
       } else if (results[0].id == id) {
-        band = 2;
-        console.log("test01");
-        res.send("Usario ya registrado");
+        console.log("Usario ya registrado");
+        res.send({res: "Usario ya registrado", success: false});
       } else if (results[0].id == id && results[0].email == email) {
-        band = 2;
-        res.send("Usario ya registrado");
+        console.log("Usario ya registrado");
+        res.send({res: "Usario ya registrado", success: false});
       }
     }
   });
