@@ -55,6 +55,7 @@ router.post("/", function (req, res, next) {
                 tarifaHora: results[0].tarifa_hora,
                 puntuacion: results[0].puntuacion,
                 telefono: results[0].telefono,
+                role: "trabajadores"
               },
               token: accessToken,
               success: true
@@ -70,6 +71,7 @@ router.post("/", function (req, res, next) {
                 apellidos: results[0].apellidos,
                 fechaNacimiento: results[0].fecha_nacimiento,
                 telefono: results[0].telefono,
+                role: "clientes"
               },
               token: accessToken,
               success: true
