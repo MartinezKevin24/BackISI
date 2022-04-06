@@ -1,16 +1,13 @@
-var express = require("express");
-var mysql = require("mysql");
-var bcrypt = require("bcryptjs");
-const { NULL } = require("mysql/lib/protocol/constants/types");
-var router = express.Router();
-
-var band = 0;
+const express = require("express");
+const mysql = require("mysql");
+const bcrypt = require("bcryptjs");
+const router = express.Router();
 
 const connectionBD = mysql.createConnection({
-  host: "localhost",
-  user: "root",
+  host: process.env.HOST,
+  user: process.env.USER,
   password: "",
-  database: "cameya",
+  database: process.env.DATABASE,
   multipleStatements: true,
   
 });
@@ -20,7 +17,7 @@ router.get("/", function (req, res, next) {
 });
 
 router.post("/client", async function (req, res, next) {
-  var {
+  let {
     id,
     email,
     tipoDoc,
@@ -31,33 +28,32 @@ router.post("/client", async function (req, res, next) {
     puntuacion,
     phone
   } = req.body;
+  password = bcrypt.hashSync(password, 10);
 
-  var sql = `SELECT id,email FROM clientes WHERE id='${id}' OR email='${email}'`;
+  let sql = `SELECT id,email FROM clientes WHERE id='${id}' OR email='${email}'`;
   await connectionBD.query(sql, function (error, results) {
     if (error) {
       throw error;
     } else {
       if (results[0] == null) {
         band = 1;
-        password = bcrypt.hashSync(password, 10);
-        var sql = `INSERT INTO clientes (id,email,tipo_documento,nombres,apellidos,fecha_nacimiento,password,puntuacion,phone)
+        let sql = `INSERT INTO clientes (id,email,tipo_documento,nombres,apellidos,fecha_nacimiento,password,puntuacion,telefono)
         VALUES ('${id}','${email}','${tipoDoc}','${nombres}','${apellidos}','${fechaNacimiento}',
         '${password}',${puntuacion}, ${phone})`;
         connectionBD.query(sql, function (error, results) {
           if (error) {
             console.log(error);
           } else {
-            res.send("Registro exitoso");
-            console.log("Registro exitoso");
+            res.send({res: "Registro exitoso", success: true});
           }
         });
       } else if (results[0].email == email) {
-        res.send("Usuario ya registrado");
+        res.send({res: "Usario ya registrado", success: false});
       } else if (results[0].id == id) {
         console.log("test01");
-        res.send("Usuario ya registrado");
+        res.send({res: "Usario ya registrado", success: false});
       } else if (results[0].id == id && results[0].email == email) {
-        res.send("Usuario ya registrado");
+        res.send({res: "Usario ya registrado", success: false});
       }
     }
   });
@@ -65,7 +61,7 @@ router.post("/client", async function (req, res, next) {
 });
 
 router.post("/worker", async function (req, res, next) {
-  var {
+  let {
     id,
     email,
     tipoDoc,
@@ -78,16 +74,16 @@ router.post("/worker", async function (req, res, next) {
     puntuacion,
     phone
   } = req.body;
+  password = bcrypt.hashSync(password, 10);
 
-  var sql = `SELECT id,email FROM trabajadores WHERE id='${id}' OR email='${email}'`;
+  let sql = `SELECT id,email FROM trabajadores WHERE id='${id}' OR email='${email}'`;
   await connectionBD.query(sql, function (error, results) {
     if (error) {
       throw error;
     } else {
       if (results[0] == null) {
         band = 1;
-        password = bcrypt.hashSync(password, 10);
-        var sql = `INSERT INTO trabajadores (id,email,tipo_documento,nombres,apellidos,fecha_nacimiento,password,tipo_servicio,tarifa_hora,puntuacion,phone)
+        let sql = `INSERT INTO trabajadores (id,email,tipo_documento,nombres,apellidos,fecha_nacimiento,password,tipo_servicio,tarifa_hora,puntuacion,telefono)
         VALUES ('${id}','${email}','${tipoDoc}','${nombres}','${apellidos}','${fechaNacimiento}',
         '${password}','${tipoServicio}',${tarifaHora},${puntuacion}, ${phone})`;
         connectionBD.query(sql, function (error, results) {
@@ -95,17 +91,13 @@ router.post("/worker", async function (req, res, next) {
             console.log(error);
           } else {
             res.send({res: "Registro exitoso", success: true});
-            console.log("Registro exitoso");
           }
         });
       } else if (results[0].email == email) {
-        console.log("Usario ya registrado");
         res.send({res: "Usario ya registrado", success: false});
       } else if (results[0].id == id) {
-        console.log("Usario ya registrado");
         res.send({res: "Usario ya registrado", success: false});
       } else if (results[0].id == id && results[0].email == email) {
-        console.log("Usario ya registrado");
         res.send({res: "Usario ya registrado", success: false});
       }
     }
@@ -113,6 +105,5 @@ router.post("/worker", async function (req, res, next) {
   
 });
 
-var sqlVerification = (id, email, table) => {};
 
 module.exports = router;

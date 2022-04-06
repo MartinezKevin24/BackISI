@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mysql = require('mysql');
 const cors = require('cors');
+require('dotenv').config();
 
 const corsOptions = {
   origin: 'http://localhost:3000',
