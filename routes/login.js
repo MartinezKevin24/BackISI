@@ -25,6 +25,8 @@ router.post("/", function (req, res, next) {
         console.log("Correo o contraseña incorrecta2");
         res.send({
           message: "Not logged, email or password incorrect",
+          data: {},
+          token: null,
           success: false,
         });
       } else if (results[0].email == email) {
@@ -32,6 +34,8 @@ router.post("/", function (req, res, next) {
           console.log("Correo o contraseña incorrecta1");
           res.send({
             message: "Not Logged, email or password incorrect",
+            data: {},
+            token: null,
             success: false,
           });
         } else {
@@ -53,6 +57,7 @@ router.post("/", function (req, res, next) {
                 telefono: results[0].telefono,
               },
               token: accessToken,
+              success: true
             });
           } else {
             res.header("Autenticado", accessToken).json({
@@ -67,6 +72,7 @@ router.post("/", function (req, res, next) {
                 telefono: results[0].telefono,
               },
               token: accessToken,
+              success: true
             });
           }
         }
