@@ -41,8 +41,15 @@ router.post("/", function (req, res, next) {
         } else {
           console.log({ message: "Logged correctamente", success: true });
           const accessToken = generateAccesToken(results[0].email);
+
+          const token = jwt.verify(accessToken, process.env.TOKEN)
+          console.log(token)
+
           if (table == "trabajadores") {
-            res.header("Autenticado", accessToken).json({
+            res.cookie("token", accessToken, {
+              httpOnly: true,
+              secure: false
+            }).json({
               message: "Usuario autenticado",
               data: {
                 cedula: results[0].id,
@@ -51,6 +58,7 @@ router.post("/", function (req, res, next) {
                 nombres: results[0].nombres,
                 apellidos: results[0].apellidos,
                 fechaNacimiento: results[0].fecha_nacimiento,
+                detalleServicio: results[0].detalle_servicio,
                 tipoServicio: results[0].tipo_servicio,
                 tarifaHora: results[0].tarifa_hora,
                 puntuacion: results[0].puntuacion,
@@ -58,10 +66,12 @@ router.post("/", function (req, res, next) {
                 role: "trabajadores"
               },
               token: accessToken,
-              success: true,
+              success: true
             });
           } else {
-            res.header("Autenticado", accessToken).json({
+            res.cookie("token", accessToken, {
+              httpOnly: true,
+            }).json({
               message: "Usuario autenticado",
               data: {
                 cedula: results[0].id,
@@ -74,7 +84,7 @@ router.post("/", function (req, res, next) {
                 role: "clientes"
               },
               token: accessToken,
-              success: true,
+              success: true
             });
           }
         }
