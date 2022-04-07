@@ -70,6 +70,7 @@ router.post("/worker", async function (req, res, next) {
     fechaNacimiento,
     password,
     tipoServicio,
+    detalleServicio,
     tarifaHora,
     puntuacion,
     phone
@@ -83,9 +84,9 @@ router.post("/worker", async function (req, res, next) {
     } else {
       if (results[0] == null) {
         band = 1;
-        let sql = `INSERT INTO trabajadores (id,email,tipo_documento,nombres,apellidos,fecha_nacimiento,password,tipo_servicio,tarifa_hora,puntuacion,telefono)
+        let sql = `INSERT INTO trabajadores (id,email,tipo_documento,nombres,apellidos,fecha_nacimiento,password,tipo_servicio,tarifa_hora,puntuacion,telefono, detalle_servicio)
         VALUES ('${id}','${email}','${tipoDoc}','${nombres}','${apellidos}','${fechaNacimiento}',
-        '${password}','${tipoServicio}',${tarifaHora},${puntuacion}, ${phone})`;
+        '${password}','${tipoServicio}',${tarifaHora}, ${puntuacion}, ${phone}, '${detalleServicio}')`;
         connectionBD.query(sql, function (error, results) {
           if (error) {
             console.log(error);
