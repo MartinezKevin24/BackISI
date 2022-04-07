@@ -1,20 +1,20 @@
 var express = require('express');
-const res = require('express/lib/response');
 var router = express.Router();
-const jwt = require("jsonwebtoken");
+const Auth = require("../middleware/auth");
 
 /* GET users listing. */
-router.post('/auth', (req, res, next)=>{
-  try{
+router.get('/auth', Auth,(req, res, next)=>{
+  res.send("Prueba")
+  // try{
 
-    const vari = jwt.verify(req.body.token, process.env.TOKEN);
-    console.log(vari);
-    res.sendStatus(200);
+  //   const vari = jwt.verify(req.body.token, process.env.TOKEN);
+  //   console.log(vari);
+  //   res.sendStatus(200);
 
-  }catch(err){
-    console.log(err)
-    res.sendStatus(403);
-  }
+  // }catch(err){
+  //   console.log(err)
+  //   res.sendStatus(403);
+  // }
 })
 
 router.get('/', function(req, res, next) {
