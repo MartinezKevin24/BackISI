@@ -7,13 +7,13 @@ require("dotenv").config();
 const router = express.Router();
 
 const connectionBD = mysql.createConnection({
-    host: process.env.HOST,
-    user: process.env.USER,
-    password: "",
-    database: process.env.DATABASE,
+  host: process.env.HOST,
+  user: process.env.USER,
+  password: "",
+  database: process.env.DATABASE,
 });
 
-router.get("/", function (req, res, next) {});
+router.get("/", function (req, res, next) { });
 
 router.post("/", auth, async function (req, res, next) {
   const {
@@ -25,40 +25,41 @@ router.post("/", auth, async function (req, res, next) {
     estado,
   } = req.body;
   let fechaAsiganada = Date.now();
-  let total=0;
+
 
   let sqlPrecioHora = `SELECT tarifa_hora FROM trabajadores WHERE id=${idTrabajador}`;
   await connectionBD.query(sqlPrecioHora, function (error, results) {
     if (error) {
       console.log(error);
       res.send({
-          message:"Cameyador no encontrado",
-          success:false
+        message: "Cameyador no encontrado",
+        success: false
       })
     } else {
       console.log(results[0].tarifa_hora);
-      total = parseInt(results[0].tarifa_hora) * horas;
+      let total = parseInt(results[0].tarifa_hora) * horas;
       console.log(total);
+
+      let sql = `INSERT INTO servicios(fecha_asignacion,direccion,fecha_programada,horas,total,estado,cliente_id,trabajador_id) 
+      VALUES('${fechaAsiganada}','${direccion}','${fechaProgramada}','${horas}',${total},'${estado}','${idCliente}','${idTrabajador}')`;
+
+      connectionBD.query(sql, function (error, results) {
+        if (error) {
+          console.log(error);
+          res.send({
+            success: false
+          })
+        } else {
+          res.send({
+            message:'Servicio creado correctamente',
+            success: true
+          })
+        }
+      })
     }
   });
 
-  console.log('Precio'+total);
 
-  let sql = `INSERT INTO servicios(fecha_asignacion,direccion,fecha_programada,horas,total,estado,cliente_id,trabajador_id) 
-  VALUES('${fechaAsiganada}','${direccion}','${fechaProgramada}','${horas}',${total},'${estado}','${idCliente}','${idTrabajador}')`;
-
-  await connectionBD.query(sql,function(error,results){
-      if(error){
-          console.log(error);
-          res.send({
-              success:false
-          })
-      }else{
-          res.send({
-              success:true
-          })
-      }
-  })
 
 });
 
