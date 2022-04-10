@@ -30,6 +30,8 @@ router.post("/client", async function (req, res, next) {
   } = req.body;
   password = bcrypt.hashSync(password, 10);
 
+  console.log(req.body)
+
   let sql = `SELECT id,email FROM clientes WHERE id='${id}' OR email='${email}'`;
   await connectionBD.query(sql, function (error, results) {
     if (error) {

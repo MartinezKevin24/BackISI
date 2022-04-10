@@ -13,7 +13,65 @@ const connectionBD = mysql.createConnection({
   database: process.env.DATABASE,
 });
 
-router.get("/", function (req, res, next) { });
+router.get("/:id/:tipo", async function (req, res, next) { 
+  const id = req.params.id;
+  const tipo = req.params.tipo.toLowerCase();
+  
+  if(tipo==="todos"){
+    let sql = `SELECT servicios.id, servicios.fecha_programada, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio FROM servicios, trabajadores 
+  WHERE servicios.cliente_id = "${id}" AND servicios.trabajador_id = trabajadores.id`;
+
+    await connectionBD.query(sql, function (error, results) {
+      if (error) {
+        console.log(error);
+      } else {
+        if (results[0] == null) {
+          console.log(`No hay servicios`);
+          res.send({
+            succes:false
+          })
+        }else{
+            console.log(`Enviando servicios`);
+            results.forEach(element => {
+              console.log(element.nombres);
+            });
+            res.send({
+              variable:'Array',
+              data: results,
+              succes:true
+            })
+        }
+      }
+    });
+  }else{
+    let sql = `SELECT servicios.id, servicios.fecha_programada, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio FROM servicios, trabajadores 
+    WHERE servicios.cliente_id = "${id}" AND servicios.trabajador_id = trabajadores.id AND trabajadores.tipo_servicio = "${tipo}"`;
+
+      await connectionBD.query(sql, function (error, results) {
+        if (error) {
+          console.log(error);
+        } else {
+          if (results[0] == null) {
+            console.log(`No hay servicios`);
+            res.send({
+              succes:false
+            })
+          }else{
+              console.log(`Enviando servicios`);
+              results.forEach(element => {
+                console.log(element.nombres);
+              });
+              res.send({
+                variable:'Array',
+                data: results,
+                succes:true
+              })
+          }
+        }
+      });
+  }
+
+});
 
 router.post("/", auth, async function (req, res, next) {
   const {
@@ -24,8 +82,11 @@ router.post("/", auth, async function (req, res, next) {
     horas,
     estado,
   } = req.body;
-  let fechaAsiganada = Date.now();
+  console.log(req.body)
+  let date = new Date();
+  const fechaAsiganada = date.toISOString();
 
+  console.log(fechaAsiganada)
 
   let sqlPrecioHora = `SELECT tarifa_hora FROM trabajadores WHERE id=${idTrabajador}`;
   await connectionBD.query(sqlPrecioHora, function (error, results) {
@@ -47,6 +108,7 @@ router.post("/", auth, async function (req, res, next) {
         if (error) {
           console.log(error);
           res.send({
+            message:'Error al crear el servicio',
             success: false
           })
         } else {
@@ -59,7 +121,26 @@ router.post("/", auth, async function (req, res, next) {
     }
   });
 
+  router.delete("/:id", auth, async function (req, res, next) {
+    const id = req.params.id;
 
+    console.log("ID a eliminar: ", id)
+  
+    let sql = `DELETE FROM servicios WHERE id='${id}' `;
+    await connectionBD.query(sql, function (error, results) {
+      if (error) {
+        console.log(error);
+        res.send({
+          success: false,
+        });
+      } else {
+        res.send({
+          message: "Servicio eliminado correctamente",
+          success: true,
+        });
+      }
+    });
+  });
 
 });
 

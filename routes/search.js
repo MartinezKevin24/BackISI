@@ -18,31 +18,56 @@ router.get("/",async function (req, res, next) {});
 router.post("/", auth, async function (req, res, next) {
   const { tipoServicio } = req.body;
 
-  let sql = `SELECT * FROM trabajadores WHERE tipo_servicio='${tipoServicio}'`;
+  if(tipoServicio !== null){
+    let sql = `SELECT * FROM trabajadores WHERE tipo_servicio='${tipoServicio}'`;
 
- await connectionBD.query(sql, function (error, results) {
-    if (error) {
-      console.log(error);
-    } else {
-      if (results[0] == null) {
-        console.log(`No hay cameyadores para ${tipoServicio}`);
-        res.send({
-          succes:false
-        })
-      }else{
-          console.log(`Enviando cameyadores para ${tipoServicio}`);
-          console.log(results.length)
-          results.forEach(element => {
-            console.log(element.nombres);
-          });
+    await connectionBD.query(sql, function (error, results) {
+      if (error) {
+        console.log(error);
+      } else {
+        if (results[0] == null) {
+          console.log(`No hay cameyadores para ${tipoServicio}`);
           res.send({
-            variable:'Array',
-            data: results,
-            succes:true
+            succes:false
           })
+        }else{
+            console.log(`Enviando cameyadores para ${tipoServicio}`);
+            results.forEach(element => {
+              console.log(element.nombres);
+            });
+            res.send({
+              variable:'Array',
+              data: results,
+              succes:true
+            })
+        }
       }
-    }
-  });
+    });
+  }else{
+    let sql = `SELECT * FROM trabajadores`;
+    await connectionBD.query(sql, function (error, results) {
+      if (error) {
+        console.log(error);
+      } else {
+        if (results[0] == null) {
+          console.log(`No hay cameyadores`);
+          res.send({
+            succes:false
+          })
+        }else{
+            console.log(`Enviando cameyadores`);
+            results.forEach(element => {
+              console.log(element.nombres);
+            });
+            res.send({
+              variable:'Array',
+              data: results,
+              succes:true
+            })
+        }
+      }
+    });
+  }
 });
 
 module.exports = router;
