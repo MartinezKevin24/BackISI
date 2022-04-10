@@ -21,7 +21,7 @@ router.get("/:id/:tipo", async function (req, res, next) {
   if(role==="clientes"){
     if(tipo==="todos"){
       let sql = `SELECT servicios.id, servicios.fecha_programada, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio FROM servicios, trabajadores 
-    WHERE servicios.cliente_id = "${id}" AND servicios.trabajador_id = trabajadores.id`;
+    WHERE servicios.cliente_id = '${id}' AND servicios.trabajador_id = trabajadores.id`;
   
       await connectionBD.query(sql, function (error, results) {
         if (error) {
@@ -47,7 +47,7 @@ router.get("/:id/:tipo", async function (req, res, next) {
       });
     }else{
       let sql = `SELECT servicios.id, servicios.fecha_programada, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio FROM servicios, trabajadores 
-      WHERE servicios.cliente_id = "${id}" AND servicios.trabajador_id = trabajadores.id AND trabajadores.tipo_servicio = "${tipo}"`;
+      WHERE servicios.cliente_id = '${id}' AND servicios.trabajador_id = trabajadores.id AND trabajadores.tipo_servicio = '${tipo}'`;
   
         await connectionBD.query(sql, function (error, results) {
           if (error) {
@@ -75,7 +75,7 @@ router.get("/:id/:tipo", async function (req, res, next) {
   }else{
     let sql = `SELECT servicios.id, servicios.fecha_programada, servicios.total, servicios.direccion, clientes.nombres, clientes.apellidos, clientes.telefono 
                FROM servicios, clientes 
-               WHERE servicios.trabajador_id = "${id}"`;
+               WHERE servicios.trabajador_id = '${id}' AND clientes.id = servicios.cliente_id`;
   
         await connectionBD.query(sql, function (error, results) {
           if (error) {
