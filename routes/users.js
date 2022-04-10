@@ -1,6 +1,16 @@
-var express = require('express');
+var express = require("express");
+const bcrypt = require("bcryptjs");
+const mysql = require("mysql");
 var router = express.Router();
 const Auth = require("../middleware/auth");
+
+const connectionBD = mysql.createConnection({
+  host: process.env.HOST,
+  user: process.env.USER,
+  password: "",
+  database: process.env.DATABASE,
+  multipleStatements: true,
+});
 
 /* GET users listing. */
 router.get('/auth', Auth,(req, res, next)=>{

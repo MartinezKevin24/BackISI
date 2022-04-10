@@ -13,7 +13,7 @@ const connectionBD = mysql.createConnection({
   database: process.env.DATABASE,
 });
 
-router.get("/",async function (req, res, next) {});
+router.get("/", async function (req, res, next) {});
 
 router.post("/", auth, async function (req, res, next) {
   const { tipoServicio } = req.body;

@@ -94,8 +94,8 @@ router.post("/", auth, async function (req, res, next) {
       console.log(error);
       res.send({
         message: "Cameyador no encontrado",
-        success: false
-      })
+        success: false,
+      });
     } else {
       console.log(results[0].tarifa_hora);
       let total = parseInt(results[0].tarifa_hora) * horas;
@@ -113,35 +113,32 @@ router.post("/", auth, async function (req, res, next) {
           })
         } else {
           res.send({
-            message:'Servicio creado correctamente',
-            success: true
-          })
+            message: "Servicio creado correctamente",
+            success: true,
+          });
         }
-      })
+      });
     }
   });
+});
 
-  router.delete("/:id", auth, async function (req, res, next) {
-    const id = req.params.id;
+router.delete("/:id", auth, async function (req, res, next) {
+  const id = req.params.id;
 
-    console.log("ID a eliminar: ", id)
-  
-    let sql = `DELETE FROM servicios WHERE id='${id}' `;
-    await connectionBD.query(sql, function (error, results) {
-      if (error) {
-        console.log(error);
-        res.send({
-          success: false,
-        });
-      } else {
-        res.send({
-          message: "Servicio eliminado correctamente",
-          success: true,
-        });
-      }
-    });
+  let sql = `DELETE FROM servicios WHERE id='${id}' `;
+  await connectionBD.query(sql, function (error, results) {
+    if (error) {
+      console.log(error);
+      res.send({
+        success: false,
+      });
+    } else {
+      res.send({
+        message: "Servicio eliminado correctamente",
+        success: true,
+      });
+    }
   });
-
 });
 
 module.exports = router;
