@@ -16,37 +16,13 @@ const connectionBD = mysql.createConnection({
 router.get("/:id/:tipo", async function (req, res, next) { 
   const id = req.params.id;
   const tipo = req.params.tipo.toLowerCase();
+  const role  = req.headers.role;
   
-  if(tipo==="todos"){
-    let sql = `SELECT servicios.id, servicios.fecha_programada, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio FROM servicios, trabajadores 
-  WHERE servicios.cliente_id = "${id}" AND servicios.trabajador_id = trabajadores.id`;
-
-    await connectionBD.query(sql, function (error, results) {
-      if (error) {
-        console.log(error);
-      } else {
-        if (results[0] == null) {
-          console.log(`No hay servicios`);
-          res.send({
-            succes:false
-          })
-        }else{
-            console.log(`Enviando servicios`);
-            results.forEach(element => {
-              console.log(element.nombres);
-            });
-            res.send({
-              variable:'Array',
-              data: results,
-              succes:true
-            })
-        }
-      }
-    });
-  }else{
-    let sql = `SELECT servicios.id, servicios.fecha_programada, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio FROM servicios, trabajadores 
-    WHERE servicios.cliente_id = "${id}" AND servicios.trabajador_id = trabajadores.id AND trabajadores.tipo_servicio = "${tipo}"`;
-
+  if(role==="clientes"){
+    if(tipo==="todos"){
+      let sql = `SELECT servicios.id, servicios.fecha_programada, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio FROM servicios, trabajadores 
+    WHERE servicios.cliente_id = "${id}" AND servicios.trabajador_id = trabajadores.id`;
+  
       await connectionBD.query(sql, function (error, results) {
         if (error) {
           console.log(error);
@@ -69,6 +45,61 @@ router.get("/:id/:tipo", async function (req, res, next) {
           }
         }
       });
+    }else{
+      let sql = `SELECT servicios.id, servicios.fecha_programada, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio FROM servicios, trabajadores 
+      WHERE servicios.cliente_id = "${id}" AND servicios.trabajador_id = trabajadores.id AND trabajadores.tipo_servicio = "${tipo}"`;
+  
+        await connectionBD.query(sql, function (error, results) {
+          if (error) {
+            console.log(error);
+          } else {
+            if (results[0] == null) {
+              console.log(`No hay servicios`);
+              res.send({
+                succes:false
+              })
+            }else{
+                console.log(`Enviando servicios`);
+                results.forEach(element => {
+                  console.log(element.nombres);
+                });
+                res.send({
+                  variable:'Array',
+                  data: results,
+                  succes:true
+                })
+            }
+          }
+        });
+    }
+  }else{
+    let sql = `SELECT servicios.id, servicios.fecha_programada, servicios.total, servicios.direccion, clientes.nombres, clientes.apellidos, clientes.telefono 
+               FROM servicios, clientes 
+               WHERE servicios.trabajador_id = "${id}"`;
+  
+        await connectionBD.query(sql, function (error, results) {
+          if (error) {
+            console.log(error);
+          } else {
+            if (results[0] == null) {
+              console.log(`No hay servicios`);
+              res.send({
+                succes:false
+              })
+            }else{
+                console.log(`Enviando servicios`);
+                results.forEach(element => {
+                  console.log(element.nombres);
+                });
+                res.send({
+                  variable:'Array',
+                  data: results,
+                  succes:true
+                })
+            }
+          }
+        });
+    
   }
 
 });

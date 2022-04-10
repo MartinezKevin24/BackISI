@@ -22,6 +22,7 @@ router.post("/edit", Auth, async function (req, res, next) {
     let { id, telefono, password } = req.body;
     password = bcrypt.hashSync(password, 10);
     let sql = `UPDATE clientes SET telefono='${telefono}',password='${password}' WHERE id='${id}'`;
+    console.log(sql)
     await connectionBD.query(sql, function (error, results) {
       if (error) {
         console.log(error);
