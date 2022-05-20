@@ -114,10 +114,16 @@ router.post("/", auth, async function (req, res, next) {
     estado,
   } = req.body;
   console.log(req.body)
-  let date = new Date();
-  const fechaAsiganada = date.toISOString();
+  const dat = new Date();
 
-  console.log(fechaAsiganada)
+  let ano = dat.getFullYear();
+  let mes = dat.getMonth();
+  let dia = dat.getDay();
+  let hora = dat.getHours();
+  let minuto = dat.getMinutes();
+  let segundo = dat.getSeconds();
+
+  let fechaAsiganada = `${ano}-${mes}-${dia} ${hora}:${minuto}:${segundo}`;
 
   let sqlPrecioHora = `SELECT tarifa_hora FROM trabajadores WHERE id=${idTrabajador}`;
   await connectionBD.query(sqlPrecioHora, function (error, results) {
