@@ -44,7 +44,11 @@ router.post("/", function (req, res, next) {
 
           const token = jwt.verify(accessToken, process.env.TOKEN)
           console.log(token)
-
+          let ano = results[0].fecha_nacimiento.getFullYear();
+          let mes = results[0].fecha_nacimiento.getMonth()+1;
+          let dia = results[0].fecha_nacimiento.getDay();
+          let fecha=`${ano}-${mes}-${dia}`;
+          console.log(fecha,'test');
           if (table == "trabajadores") {
             res.cookie("token", accessToken, {
               httpOnly: true,
@@ -57,7 +61,7 @@ router.post("/", function (req, res, next) {
                 tipoDocumento: results[0].tipo_documento,
                 nombres: results[0].nombres,
                 apellidos: results[0].apellidos,
-                fechaNacimiento: results[0].fecha_nacimiento,
+                fechaNacimiento: fecha,
                 detalleServicio: results[0].detalle_servicio,
                 tipoServicio: results[0].tipo_servicio,
                 tarifaHora: results[0].tarifa_hora,
@@ -79,7 +83,7 @@ router.post("/", function (req, res, next) {
                 tipoDocumento: results[0].tipo_documento,
                 nombres: results[0].nombres,
                 apellidos: results[0].apellidos,
-                fechaNacimiento: results[0].fecha_nacimiento,
+                fechaNacimiento: fecha,
                 telefono: results[0].telefono,
                 role: "clientes"
               },
