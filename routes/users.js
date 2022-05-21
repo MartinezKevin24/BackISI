@@ -3,6 +3,8 @@ const bcrypt = require("bcryptjs");
 const mysql = require("mysql");
 var router = express.Router();
 const Auth = require("../middleware/auth");
+const cloudinary = require("../middleware/cloudinary");
+const upload = require("../middleware/multer");
 
 const connectionBD = mysql.createConnection({
   host: process.env.HOST,
@@ -17,6 +19,33 @@ router.get('/auth', Auth,(req, res, next)=>{
   res.send("Prueba")
 })
 
+router.post("/profilepic",Auth, upload.single('image'), async function (req,res){
+
+  try{
+    const image = await cloudinary.uploader.upload(req.file.path);
+    const imagePath = image.secure_url;
+    res.json(imagePath);
+    let { id , role} = req.body;
+    let sql = `UPDATE ${role} SET foto_perfil='${imagePath}' WHERE id='${id}'`;
+    await connectionBD.query(sql, function (error, results){
+      if(error){
+        console.log(error);
+        res.send({
+          success: false
+        })
+      }else{
+        res.send({
+          message:'Foto de perfil actualizada',
+          success: true
+        })
+      }
+    })
+  } catch (err){
+    console.log(err)
+  }
+
+} )
+
 router.post("/edit", Auth, async function (req, res, next) {
   if (req.body.role == "clientes") {
     let { id, telefono, password } = req.body;
@@ -27,7 +56,7 @@ router.post("/edit", Auth, async function (req, res, next) {
       if (error) {
         console.log(error);
         res.send({
-          success: false,
+          success: false
         });
       } else {
         res.send({

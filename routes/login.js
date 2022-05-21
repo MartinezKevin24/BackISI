@@ -67,6 +67,7 @@ router.post("/", function (req, res, next) {
                 tarifaHora: results[0].tarifa_hora,
                 puntuacion: results[0].puntuacion,
                 telefono: results[0].telefono,
+                fotoPerfil: results[0].foto_perfil,
                 role: "trabajadores"
               },
               token: accessToken,
@@ -85,6 +86,7 @@ router.post("/", function (req, res, next) {
                 apellidos: results[0].apellidos,
                 fechaNacimiento: fecha,
                 telefono: results[0].telefono,
+                fotoPerfil: results[0].foto_perfil,
                 role: "clientes"
               },
               token: accessToken,
