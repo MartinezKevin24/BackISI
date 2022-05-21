@@ -43,9 +43,10 @@ create table if not exists servicios
     fecha_programada datetime not null,
     horas            int      not null,
     total            bigint   not null,
-    estado           char(20) not null,
+    estado_servicio           char(20) not null,
     cliente_id       char(20) not null,
     trabajador_id    char(20) not null,
+    estado_solicitud varchar(20) default 'pendiente' not null,
     foreign key (cliente_id) references clientes (id),
     foreign key (trabajador_id) references trabajadores (id)
 );
