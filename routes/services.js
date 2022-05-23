@@ -178,6 +178,7 @@ router.delete("/:id", auth, async function (req, res, next) {
 
 router.put("/complete/:id", auth, async function (req, res, next) {
   const id = req.params.id;
+  console.log(id)
   const fechaServer = new Date();
   let sql = `SELECT fecha_programada, horas FROM servicios WHERE id='${id}'`;
   await connectionBD.query(sql, function (error, results) {
@@ -187,13 +188,25 @@ router.put("/complete/:id", auth, async function (req, res, next) {
         success: false
       });
     } else {
+
       let fechaServicio = results[0].fecha_programada;
       let horas = results[0].horas;
+      let hora = fechaServicio.getHours();
+      fechaServicio.setHours(hora - 5 + horas);
+      fechaServer.setHours(fechaServer.getHours() - 5);
+
+      console.log(fechaServicio, fechaServer)
+
       if (fechaServer > fechaServicio) {
+
+        console.log("hola")
+
         let sql2 = `UPDATE servicios SET estado_servicio = 1 WHERE id='${id}'`;
         let anoServer = fechaServer.getFullYear();
         let anoServicio = fechaServicio.getFullYear();
+
         if ((anoServer - anoServicio) > 0) {
+
           connectionBD.query(sql2, function (error, results) {
             if (error) {
               console.log(error);
@@ -207,10 +220,14 @@ router.put("/complete/:id", auth, async function (req, res, next) {
               });
             }
           });
+
         } else if ((anoServer - anoServicio) == 0) {
+
           let mesServer = fechaServer.getMonth();
           let mesServicio = fechaServicio.getMonth();
+
           if ((mesServer - mesServicio) > 0) {
+
             connectionBD.query(sql2, function (error, results) {
               if (error) {
                 console.log(error);
@@ -224,10 +241,14 @@ router.put("/complete/:id", auth, async function (req, res, next) {
                 });
               }
             });
+
           } else if (((mesServer - mesServicio) == 0)) {
+
             let diaServer = fechaServer.getDay();
             let diaServicio = fechaServicio.getDay();
+
             if ((diaServer - diaServicio) > 0) {
+
               connectionBD.query(sql2, function (error, results) {
                 if (error) {
                   console.log(error);
@@ -241,10 +262,13 @@ router.put("/complete/:id", auth, async function (req, res, next) {
                   });
                 }
               });
+
             } else if ((diaServer - diaServicio) == 0) {
+
               let horaServer = fechaServer.getHours();
               let horaServicio = fechaServicio.getHours();
               if ((horaServer - horaServicio) >= horas) {
+
                 connectionBD.query(sql2, function (error, results) {
                   if (error) {
                     console.log(error);
@@ -258,6 +282,7 @@ router.put("/complete/:id", auth, async function (req, res, next) {
                     });
                   }
                 });
+
               } else {
                 res.send({
                   message: "Servicio no completado",
@@ -282,6 +307,11 @@ router.put("/complete/:id", auth, async function (req, res, next) {
             success: false
           })
         }
+      }else{
+        res.send({
+          message: "Servicio no completado",
+          succes: false
+        });
       }
     }
   });
