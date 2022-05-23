@@ -41,56 +41,67 @@ router.post("/", function (req, res, next) {
         } else {
           console.log({ message: "Logged correctamente", success: true });
           const accessToken = generateAccesToken(results[0].email);
-
-          const token = jwt.verify(accessToken, process.env.TOKEN)
-          console.log(token)
+          const token = jwt.verify(accessToken, process.env.TOKEN);
+          console.log(token);
           let ano = results[0].fecha_nacimiento.getFullYear();
-          let mes = results[0].fecha_nacimiento.getMonth()+1;
+          let mes = results[0].fecha_nacimiento.getMonth() + 1;
           let dia = results[0].fecha_nacimiento.getDay();
-          let fecha=`${ano}-${mes}-${dia}`;
-          console.log(fecha,'test');
+          let fecha = `${ano}-${mes}-${dia}`;
+          console.log(fecha, "test");
           if (table == "trabajadores") {
-            res.cookie("token", accessToken, {
-              httpOnly: true,
-              secure: false
-            }).json({
-              message: "Usuario autenticado",
-              data: {
-                cedula: results[0].id,
-                email: results[0].email,
-                tipoDocumento: results[0].tipo_documento,
-                nombres: results[0].nombres,
-                apellidos: results[0].apellidos,
-                fechaNacimiento: fecha,
-                detalleServicio: results[0].detalle_servicio,
-                tipoServicio: results[0].tipo_servicio,
-                tarifaHora: results[0].tarifa_hora,
-                puntuacion: results[0].puntuacion,
-                telefono: results[0].telefono,
-                fotoPerfil: results[0].foto_perfil,
-                role: "trabajadores"
-              },
-              token: accessToken,
-              success: true
+            let sqlProm = `SELECT AVG(puntuacion_trabajador) AS promedio FROM servicios WHERE trabajador_id=${results[0].id}`;
+            connectionBD.query(sqlProm, function (error, resultados) {
+              res
+                .cookie("token", accessToken, {
+                  httpOnly: true,
+                  secure: false,
+                })
+                .json({
+                  message: "Usuario autenticado",
+                  data: {
+                    cedula: results[0].id,
+                    email: results[0].email,
+                    tipoDocumento: results[0].tipo_documento,
+                    nombres: results[0].nombres,
+                    apellidos: results[0].apellidos,
+                    fechaNacimiento: fecha,
+                    detalleServicio: results[0].detalle_servicio,
+                    tipoServicio: results[0].tipo_servicio,
+                    tarifaHora: results[0].tarifa_hora,
+                    puntuacion: results[0].puntuacion,
+                    telefono: results[0].telefono,
+                    fotoPerfil: results[0].foto_perfil,
+                    puntuacion: resultados[0].promedio,
+                    role: "trabajadores",
+                  },
+                  token: accessToken,
+                  success: true,
+                });
             });
           } else {
-            res.cookie("token", accessToken, {
-              httpOnly: true,
-            }).json({
-              message: "Usuario autenticado",
-              data: {
-                cedula: results[0].id,
-                email: results[0].email,
-                tipoDocumento: results[0].tipo_documento,
-                nombres: results[0].nombres,
-                apellidos: results[0].apellidos,
-                fechaNacimiento: fecha,
-                telefono: results[0].telefono,
-                fotoPerfil: results[0].foto_perfil,
-                role: "clientes"
-              },
-              token: accessToken,
-              success: true
+            let sqlProm = `SELECT AVG(puntuacion_cliente) AS promedio FROM servicios WHERE cliente_id=${results[0].id}`;
+            connectionBD.query(sqlProm, function (error, resultados) {
+              res
+                .cookie("token", accessToken, {
+                  httpOnly: true,
+                })
+                .json({
+                  message: "Usuario autenticado",
+                  data: {
+                    cedula: results[0].id,
+                    email: results[0].email,
+                    tipoDocumento: results[0].tipo_documento,
+                    nombres: results[0].nombres,
+                    apellidos: results[0].apellidos,
+                    fechaNacimiento: fecha,
+                    telefono: results[0].telefono,
+                    fotoPerfil: results[0].foto_perfil,
+                    puntuacion: resultados[0].promedio,
+                    role: "clientes",
+                  },
+                  token: accessToken,
+                  success: true,
+                });
             });
           }
         }
