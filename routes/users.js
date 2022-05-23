@@ -20,14 +20,29 @@ router.get("/auth", Auth, (req, res, next) => {
 });
 
 router.post("/edit", Auth, upload.single("image"), async function (req, res, next) {
-    console.log(req);
-    const image = await cloudinary.uploader.upload(req.file.path);
-    const imagePath = image.secure_url;
+
+    console.log(req.file)
+
+    let imagePath = null;
+
+    if(req.file){
+        const image = await cloudinary.uploader.upload(req.file.path);
+        imagePath = image.secure_url;
+    }
+      
     if (req.body.role == "clientes") {
       let { id, telefono, password } = req.body;
       password = bcrypt.hashSync(password, 10);
-      let sql = `UPDATE clientes SET telefono='${telefono}',password='${password}',foto_perfil='${imagePath}' WHERE id='${id}'`;
-      console.log(sql);
+
+      let sql;
+
+      if(req.file){
+        sql = `UPDATE clientes SET telefono='${telefono}',password='${password}',foto_perfil='${imagePath}' WHERE id='${id}'`;
+      }else{
+        sql = `UPDATE clientes SET telefono='${telefono}',password='${password}' WHERE id='${id}'`;
+      }
+      
+      
       await connectionBD.query(sql, function (error, results) {
         if (error) {
           console.log(error);
@@ -41,7 +56,9 @@ router.post("/edit", Auth, upload.single("image"), async function (req, res, nex
           });
         }
       });
+
     } else {
+
       let {
         id,
         password,
@@ -50,10 +67,19 @@ router.post("/edit", Auth, upload.single("image"), async function (req, res, nex
         tarifaHora,
         telefono,
       } = req.body;
+      let sql;
       password = bcrypt.hashSync(password, 10);
-      let sql = `UPDATE trabajadores SET 
-    password='${password}',tipo_servicio='${tipoServicio}',
-    detalle_servicio='${detalleServicio}',tarifa_hora=${tarifaHora},telefono='${telefono}',foto_perfil='${imagePath}' WHERE id='${id}'`;
+
+      if(req.file){
+        sql = `UPDATE trabajadores SET 
+        password='${password}',tipo_servicio='${tipoServicio}',
+        detalle_servicio='${detalleServicio}',tarifa_hora=${tarifaHora},telefono='${telefono}',foto_perfil='${imagePath}' WHERE id='${id}'`;
+      }else{
+        sql = `UPDATE trabajadores SET 
+        password='${password}',tipo_servicio='${tipoServicio}',
+        detalle_servicio='${detalleServicio}',tarifa_hora=${tarifaHora},telefono='${telefono}' WHERE id='${id}'`;
+      }
+
       await connectionBD.query(sql, function (error, results) {
         if (error) {
           console.log(error);
