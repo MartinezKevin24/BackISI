@@ -20,7 +20,7 @@ router.get("/:id/:tipo", async function (req, res, next) {
 
   if (role === "clientes") {
     if (tipo === "todos") {
-      let sql = `SELECT servicios.id, servicios.fecha_programada, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio FROM servicios, trabajadores 
+      let sql = `SELECT servicios.id, servicios.estado_solicitud, servicios.fecha_programada, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio FROM servicios, trabajadores 
     WHERE servicios.cliente_id = '${id}' AND servicios.trabajador_id = trabajadores.id`;
 
       await connectionBD.query(sql, function (error, results) {
@@ -47,7 +47,7 @@ router.get("/:id/:tipo", async function (req, res, next) {
         }
       });
     } else {
-      let sql = `SELECT servicios.id, servicios.fecha_programada, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio, servicio.estado_servicio FROM servicios, trabajadores 
+      let sql = `SELECT servicios.id, servicios.estado_solicitud, servicios.fecha_programada, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio, servicio.estado_servicio FROM servicios, trabajadores 
       WHERE servicios.cliente_id = '${id}' AND servicios.trabajador_id = trabajadores.id AND trabajadores.tipo_servicio = '${tipo}'`;
 
       await connectionBD.query(sql, function (error, results) {
@@ -74,7 +74,7 @@ router.get("/:id/:tipo", async function (req, res, next) {
       });
     }
   } else {
-    let sql = `SELECT servicios.id, servicios.fecha_programada, servicios.total, servicios.direccion, clientes.nombres, clientes.apellidos, clientes.telefono, servicio.estado_servicio 
+    let sql = `SELECT servicios.id, servicios.estado_solicitud, servicios.fecha_programada, servicios.total, servicios.direccion, clientes.nombres, clientes.apellidos, clientes.telefono, servicios.estado_servicio 
                FROM servicios, clientes 
                WHERE servicios.trabajador_id = '${id}' AND clientes.id = servicios.cliente_id`;
 
@@ -110,8 +110,8 @@ router.post("/", auth, async function (req, res, next) {
   const dat = new Date();
 
   let ano = dat.getFullYear();
-  let mes = dat.getMonth();
-  let dia = dat.getDay();
+  let mes = dat.getMonth()+1;
+  let dia = dat.getDate();
   let hora = dat.getHours();
   let minuto = dat.getMinutes();
   let segundo = dat.getSeconds();
@@ -171,116 +171,138 @@ router.delete("/:id", auth, async function (req, res, next) {
   });
 });
 
-router.put("/:id", auth, async function (req, res, next) {
-  const id = req.params.id;
-  const fechaServer = new Date();
-  let sql = `SELECT fecha_programada, horas FROM servicios WHERE id='${id}'`;
-  await connectionBD.query(sql, function (error, results) {
-    if (error) {
+// router.put("/:id", auth, async function (req, res, next) {
+//   const id = req.params.id;
+//   const fechaServer = new Date();
+//   let sql = `SELECT fecha_programada, horas FROM servicios WHERE id='${id}'`;
+//   await connectionBD.query(sql, function (error, results) {
+//     if (error) {
+//       console.log(error);
+//       res.send({
+//         success: false
+//       });
+//     } else {
+//       let fechaServicio = results[0].fecha_programada;
+//       let horas = results[0].horas;
+//       if (fechaServer > fechaServicio) {
+//         let sql2 = `UPDATE servicios SET estado_servicio = 1 WHERE id='${id}'`;
+//         let anoServer = fechaServer.getFullYear();
+//         let anoServicio = fechaServicio.getFullYear();
+//         if((anoServer - anoServicio) > 0){
+//           connectionBD.query(sql2, function (error, results) {
+//             if (error) {
+//               console.log(error);
+//               res.send({
+//                 succes: false
+//               });
+//             } else {
+//               res.send({
+//                 message: "Servicio completado",
+//                 succes: true
+//               });
+//             }
+//           });
+//         }else if((anoServer - anoServicio) == 0){
+//           let mesServer = fechaServer.getMonth();
+//           let mesServicio = fechaServicio.getMonth();
+//           if((mesServer - mesServicio) > 0){
+//             connectionBD.query(sql2, function (error, results) {
+//               if (error) {
+//                 console.log(error);
+//                 res.send({
+//                   succes: false
+//                 });
+//               } else {
+//                 res.send({
+//                   message: "Servicio completado",
+//                   succes: true
+//                 });
+//               }
+//             });
+//           }else if(((mesServer - mesServicio) == 0)){
+//             let diaServer = fechaServer.getDay();
+//             let diaServicio = fechaServicio.getDay();
+//             if((diaServer - diaServicio) > 0){
+//               connectionBD.query(sql2, function (error, results) {
+//                 if (error) {
+//                   console.log(error);
+//                   res.send({
+//                     succes: false
+//                   });
+//                 } else {
+//                   res.send({
+//                     message: "Servicio completado",
+//                     succes: true
+//                   });
+//                 }
+//               });
+//             }else if((diaServer - diaServicio) == 0){
+//               let horaServer = fechaServer.getHours();
+//               let horaServicio = fechaServicio.getHours();
+//               if((horaServer - horaServicio) >= horas){
+//                 connectionBD.query(sql2, function (error, results) {
+//                   if (error) {
+//                     console.log(error);
+//                     res.send({
+//                       succes: false
+//                     });
+//                   } else {
+//                     res.send({
+//                       message: "Servicio completado",
+//                       succes: true
+//                     });
+//                   }
+//                 });
+//               }else{
+//                 res.send({
+//                   message: "Servicio no completado",
+//                   success: false
+//                 })
+//               }
+//             }else{
+//               res.send({
+//                 message: "Servicio no completado",
+//                 success: false
+//               })
+//             }
+//           }else{
+//             res.send({
+//               message: "Servicio no completado",
+//               success: false
+//             })
+//           }
+//         }else{
+//           res.send({
+//             message: "Servicio no completado",
+//             success: false
+//           })
+//         }
+//       }
+//     }
+//   });
+// });
+
+router.post("/aprobar", auth, async function(req, res, next){
+  
+  let { id, estado } = req.body;
+
+  let sql = `UPDATE servicios SET estado_solicitud='${estado}' WHERE id=${id}`;
+
+  await connectionBD.query(sql, function(error, results){
+    if(error){
       console.log(error);
       res.send({
         success: false
       });
-    } else {
-      let fechaServicio = results[0].fecha_programada;
-      let horas = results[0].horas;
-      if (fechaServer > fechaServicio) {
-        let sql2 = `UPDATE servicios SET estado_servicio = 1 WHERE id='${id}'`;
-        let anoServer = fechaServer.getFullYear();
-        let anoServicio = fechaServicio.getFullYear();
-        if((anoServer - anoServicio) > 0){
-          connectionBD.query(sql2, function (error, results) {
-            if (error) {
-              console.log(error);
-              res.send({
-                succes: false
-              });
-            } else {
-              res.send({
-                message: "Servicio completado",
-                succes: true
-              });
-            }
-          });
-        }else if((anoServer - anoServicio) == 0){
-          let mesServer = fechaServer.getMonth();
-          let mesServicio = fechaServicio.getMonth();
-          if((mesServer - mesServicio) > 0){
-            connectionBD.query(sql2, function (error, results) {
-              if (error) {
-                console.log(error);
-                res.send({
-                  succes: false
-                });
-              } else {
-                res.send({
-                  message: "Servicio completado",
-                  succes: true
-                });
-              }
-            });
-          }else if(((mesServer - mesServicio) == 0)){
-            let diaServer = fechaServer.getDay();
-            let diaServicio = fechaServicio.getDay();
-            if((diaServer - diaServicio) > 0){
-              connectionBD.query(sql2, function (error, results) {
-                if (error) {
-                  console.log(error);
-                  res.send({
-                    succes: false
-                  });
-                } else {
-                  res.send({
-                    message: "Servicio completado",
-                    succes: true
-                  });
-                }
-              });
-            }else if((diaServer - diaServicio) == 0){
-              let horaServer = fechaServer.getHours();
-              let horaServicio = fechaServicio.getHours();
-              if((horaServer - horaServicio) >= horas){
-                connectionBD.query(sql2, function (error, results) {
-                  if (error) {
-                    console.log(error);
-                    res.send({
-                      succes: false
-                    });
-                  } else {
-                    res.send({
-                      message: "Servicio completado",
-                      succes: true
-                    });
-                  }
-                });
-              }else{
-                res.send({
-                  message: "Servicio no completado",
-                  success: false
-                })
-              }
-            }else{
-              res.send({
-                message: "Servicio no completado",
-                success: false
-              })
-            }
-          }else{
-            res.send({
-              message: "Servicio no completado",
-              success: false
-            })
-          }
-        }else{
-          res.send({
-            message: "Servicio no completado",
-            success: false
-          })
-        }
-      }
+    }else{
+      res.send({
+        message:"Estado cambiado",
+        success: true
+      })
     }
   });
-});
+
+})
 
 router.post("/rating", auth, async function (req, res, next){
   let {id, puntuacion, role} = req.body;
