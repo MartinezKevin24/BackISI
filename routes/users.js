@@ -20,6 +20,7 @@ router.get("/auth", Auth, (req, res, next) => {
 });
 
 router.post("/edit", Auth, upload.single("image"), async function (req, res, next) {
+    console.log(req);
     const image = await cloudinary.uploader.upload(req.file.path);
     const imagePath = image.secure_url;
     if (req.body.role == "clientes") {

@@ -25,7 +25,6 @@ router.post("/client", async function (req, res, next) {
     apellidos,
     fechaNacimiento,
     password,
-    puntuacion,
     phone
   } = req.body;
   password = bcrypt.hashSync(password, 10);
@@ -39,9 +38,9 @@ router.post("/client", async function (req, res, next) {
     } else {
       if (results[0] == null) {
         band = 1;
-        let sql = `INSERT INTO clientes (id,email,tipo_documento,nombres,apellidos,fecha_nacimiento,password,puntuacion,telefono)
+        let sql = `INSERT INTO clientes (id,email,tipo_documento,nombres,apellidos,fecha_nacimiento,password,telefono)
         VALUES ('${id}','${email}','${tipoDoc}','${nombres}','${apellidos}','${fechaNacimiento}',
-        '${password}',${puntuacion}, ${phone})`;
+        '${password}', ${phone})`;
         connectionBD.query(sql, function (error, results) {
           if (error) {
             console.log(error);

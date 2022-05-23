@@ -20,13 +20,14 @@ router.get("/:id/:tipo", async function (req, res, next) {
   
   if(role==="clientes"){
     if(tipo==="todos"){
-      let sql = `SELECT servicios.id, servicios.fecha_programada, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio FROM servicios, trabajadores 
+      let sql = `SELECT servicios.id, servicios.estado_solicitud, servicios.fecha_programada, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio FROM servicios, trabajadores 
     WHERE servicios.cliente_id = '${id}' AND servicios.trabajador_id = trabajadores.id`;
   
       await connectionBD.query(sql, function (error, results) {
         if (error) {
           console.log(error);
         } else {
+          console.log(results);
           if (results[0] == null) {
             console.log(`No hay servicios`);
             res.send({
@@ -35,7 +36,7 @@ router.get("/:id/:tipo", async function (req, res, next) {
           }else{
               console.log(`Enviando servicios`);
               results.forEach(element => {
-                console.log(element.nombres);
+                console.log(element);
               });
               res.send({
                 variable:'Array',
@@ -46,9 +47,9 @@ router.get("/:id/:tipo", async function (req, res, next) {
         }
       });
     }else{
-      let sql = `SELECT servicios.id, servicios.fecha_programada, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio FROM servicios, trabajadores 
+      let sql = `SELECT servicios.id, servicios.estado_solicitud, servicios.fecha_programada, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio FROM servicios, trabajadores 
       WHERE servicios.cliente_id = '${id}' AND servicios.trabajador_id = trabajadores.id AND trabajadores.tipo_servicio = '${tipo}'`;
-  
+      
         await connectionBD.query(sql, function (error, results) {
           if (error) {
             console.log(error);
@@ -73,7 +74,7 @@ router.get("/:id/:tipo", async function (req, res, next) {
         });
     }
   }else{
-    let sql = `SELECT servicios.id, servicios.fecha_programada, servicios.total, servicios.direccion, clientes.nombres, clientes.apellidos, clientes.telefono 
+    let sql = `SELECT servicios.id, servicios.estado_solicitud, servicios.fecha_programada, servicios.total, servicios.direccion, clientes.nombres, clientes.apellidos, clientes.telefono 
                FROM servicios, clientes 
                WHERE servicios.trabajador_id = '${id}' AND clientes.id = servicios.cliente_id`;
   
@@ -111,7 +112,6 @@ router.post("/", auth, async function (req, res, next) {
     direccion,
     fechaProgramada,
     horas,
-    estado,
   } = req.body;
   console.log(req.body)
   const dat = new Date();
@@ -138,8 +138,8 @@ router.post("/", auth, async function (req, res, next) {
       let total = parseInt(results[0].tarifa_hora) * horas;
       console.log(total);
 
-      let sql = `INSERT INTO servicios(fecha_asignacion,direccion,fecha_programada,horas,total,estado,cliente_id,trabajador_id) 
-      VALUES('${fechaAsiganada}','${direccion}','${fechaProgramada}','${horas}',${total},'${estado}','${idCliente}','${idTrabajador}')`;
+      let sql = `INSERT INTO servicios(fecha_asignacion,direccion,fecha_programada,horas,total,cliente_id,trabajador_id) 
+      VALUES('${fechaAsiganada}','${direccion}','${fechaProgramada}','${horas}',${total},'${idCliente}','${idTrabajador}')`;
 
       connectionBD.query(sql, function (error, results) {
         if (error) {
