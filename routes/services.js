@@ -109,8 +109,7 @@ router.get("/:id/:tipo", async function (req, res, next) {
 });
 
 router.post("/", auth, async function (req, res, next) {
-  const { idCliente, idTrabajador, direccion, fechaProgramada, horas, estado } =
-    req.body;
+  const { idCliente, idTrabajador, direccion, fechaProgramada, horas, descripcion } = req.body;
   console.log(req.body);
   const dat = new Date();
 
@@ -136,8 +135,8 @@ router.post("/", auth, async function (req, res, next) {
       let total = parseInt(results[0].tarifa_hora) * horas;
       console.log(total);
 
-      let sql = `INSERT INTO servicios(fecha_asignacion,direccion,fecha_programada,horas,total,cliente_id,trabajador_id) 
-      VALUES('${fechaAsiganada}','${direccion}','${fechaProgramada}','${horas}',${total},'${idCliente}','${idTrabajador}')`;
+      let sql = `INSERT INTO servicios(fecha_asignacion,direccion,fecha_programada,horas,total,cliente_id,trabajador_id,descripcion_servicio) 
+      VALUES('${fechaAsiganada}','${direccion}','${fechaProgramada}','${horas}',${total},'${idCliente}','${idTrabajador}', '${descripcion}')`;
 
       connectionBD.query(sql, function (error, results) {
         if (error) {
@@ -178,7 +177,6 @@ router.delete("/:id", auth, async function (req, res, next) {
 
 router.put("/complete/:id", auth, async function (req, res, next) {
   const id = req.params.id;
-  console.log(id)
   const fechaServer = new Date();
   let sql = `SELECT fecha_programada, horas FROM servicios WHERE id='${id}'`;
   await connectionBD.query(sql, function (error, results) {
@@ -199,114 +197,21 @@ router.put("/complete/:id", auth, async function (req, res, next) {
 
       if (fechaServer > fechaServicio) {
 
-        console.log("hola")
-
         let sql2 = `UPDATE servicios SET estado_servicio = 1 WHERE id='${id}'`;
-        let anoServer = fechaServer.getFullYear();
-        let anoServicio = fechaServicio.getFullYear();
-
-        if ((anoServer - anoServicio) > 0) {
-
-          connectionBD.query(sql2, function (error, results) {
-            if (error) {
-              console.log(error);
-              res.send({
-                succes: false
-              });
-            } else {
-              res.send({
-                message: "Servicio completado",
-                succes: true
-              });
-            }
-          });
-
-        } else if ((anoServer - anoServicio) == 0) {
-
-          let mesServer = fechaServer.getMonth();
-          let mesServicio = fechaServicio.getMonth();
-
-          if ((mesServer - mesServicio) > 0) {
-
-            connectionBD.query(sql2, function (error, results) {
-              if (error) {
-                console.log(error);
-                res.send({
-                  succes: false
-                });
-              } else {
-                res.send({
-                  message: "Servicio completado",
-                  succes: true
-                });
-              }
+        connectionBD.query(sql2, function (error, results) {
+          if (error) {
+            console.log(error);
+            res.send({
+              succes: false
             });
-
-          } else if (((mesServer - mesServicio) == 0)) {
-
-            let diaServer = fechaServer.getDay();
-            let diaServicio = fechaServicio.getDay();
-
-            if ((diaServer - diaServicio) > 0) {
-
-              connectionBD.query(sql2, function (error, results) {
-                if (error) {
-                  console.log(error);
-                  res.send({
-                    succes: false
-                  });
-                } else {
-                  res.send({
-                    message: "Servicio completado",
-                    succes: true
-                  });
-                }
-              });
-
-            } else if ((diaServer - diaServicio) == 0) {
-
-              let horaServer = fechaServer.getHours();
-              let horaServicio = fechaServicio.getHours();
-              if ((horaServer - horaServicio) >= horas) {
-
-                connectionBD.query(sql2, function (error, results) {
-                  if (error) {
-                    console.log(error);
-                    res.send({
-                      succes: false
-                    });
-                  } else {
-                    res.send({
-                      message: "Servicio completado",
-                      succes: true
-                    });
-                  }
-                });
-
-              } else {
-                res.send({
-                  message: "Servicio no completado",
-                  success: false
-                })
-              }
-            } else {
-              res.send({
-                message: "Servicio no completado",
-                success: false
-              })
-            }
           } else {
             res.send({
-              message: "Servicio no completado",
-              success: false
-            })
+              message: "Servicio completado",
+              succes: true
+            });
           }
-        } else {
-          res.send({
-            message: "Servicio no completado",
-            success: false
-          })
-        }
+        });
+        
       }else{
         res.send({
           message: "Servicio no completado",
