@@ -47,6 +47,7 @@ create table if not exists servicios
     estado_servicio       bit         default b'0'        null,
     puntuacion_cliente    float       default 0           null,
     puntuacion_trabajador float       default 0           null,
+    descripcion_servicio  text                            null,
     foreign key (cliente_id) references clientes (id),
     foreign key (trabajador_id) references trabajadores (id)
 );
