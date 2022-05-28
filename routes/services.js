@@ -20,7 +20,7 @@ router.get("/:id/:tipo", async function (req, res, next) {
 
   if (role === "clientes") {
     if (tipo === "todos") {
-      let sql = `SELECT servicios.id, servicios.estado_solicitud, servicios.fecha_programada, servicios.total, servicios.estado_servicio, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio FROM servicios, trabajadores 
+      let sql = `SELECT trabajadores.foto_perfil, servicios.id, servicios.estado_solicitud, servicios.fecha_programada, servicios.total, servicios.estado_servicio, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio FROM servicios, trabajadores 
     WHERE servicios.cliente_id = '${id}' AND servicios.trabajador_id = trabajadores.id`;
 
       await connectionBD.query(sql, function (error, results) {
@@ -48,7 +48,7 @@ router.get("/:id/:tipo", async function (req, res, next) {
         }
       });
     } else {
-      let sql = `SELECT servicios.id, servicios.estado_solicitud, servicios.fecha_programada, servicios.estado_servicio, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio, servicio.estado_servicio FROM servicios, trabajadores 
+      let sql = `SELECT trabajadores.foto_perfil, servicios.id, servicios.estado_solicitud, servicios.fecha_programada, servicios.estado_servicio, servicios.total, servicios.direccion, trabajadores.tipo_servicio, trabajadores.tipo_servicio, trabajadores.detalle_servicio, servicio.estado_servicio FROM servicios, trabajadores 
       WHERE servicios.cliente_id = '${id}' AND servicios.trabajador_id = trabajadores.id AND trabajadores.tipo_servicio = '${tipo}'`;
 
       await connectionBD.query(sql, function (error, results) {
@@ -77,7 +77,7 @@ router.get("/:id/:tipo", async function (req, res, next) {
       });
     }
   } else {
-    let sql = `SELECT servicios.id, servicios.estado_solicitud, servicios.fecha_programada, servicios.estado_servicio, servicios.total, servicios.direccion, clientes.nombres, clientes.apellidos, clientes.telefono, servicios.estado_servicio, clientes.email FROM servicios, clientes 
+    let sql = `SELECT clientes.foto_perfil, servicios.id, servicios.estado_solicitud, servicios.fecha_programada, servicios.estado_servicio, servicios.total, servicios.direccion, clientes.nombres, clientes.apellidos, clientes.telefono, servicios.estado_servicio, clientes.email FROM servicios, clientes 
                WHERE servicios.trabajador_id = '${id}' AND clientes.id = servicios.cliente_id`;
 
     await connectionBD.query(sql, function (error, results) {
