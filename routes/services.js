@@ -77,8 +77,7 @@ router.get("/:id/:tipo", async function (req, res, next) {
       });
     }
   } else {
-    let sql = `SELECT servicios.id, servicios.estado_solicitud, servicios.fecha_programada, servicios.estado_servicio, servicios.total, servicios.direccion, clientes.nombres, clientes.apellidos, clientes.telefono, servicios.estado_servicio 
-               FROM servicios, clientes 
+    let sql = `SELECT servicios.id, servicios.estado_solicitud, servicios.fecha_programada, servicios.estado_servicio, servicios.total, servicios.direccion, clientes.nombres, clientes.apellidos, clientes.telefono, servicios.estado_servicio, clientes.email FROM servicios, clientes 
                WHERE servicios.trabajador_id = '${id}' AND clientes.id = servicios.cliente_id`;
 
     await connectionBD.query(sql, function (error, results) {
