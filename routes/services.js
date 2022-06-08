@@ -243,7 +243,7 @@ router.put("/approval", auth, async function (req, res, next) {
 
 router.put("/rating", auth, async function (req, res, next) {
   let { id, puntuacion, role } = req.body;
-  if (role == 'trabajadores') {
+  if (role == 'clientes') {
     let sql = `UPDATE servicios SET puntuacion_cliente=${puntuacion} WHERE id=${id}`;
     await connectionBD.query(sql, function (error, results) {
       if (error) {
@@ -252,9 +252,18 @@ router.put("/rating", auth, async function (req, res, next) {
           success: false
         });
       } else {
-        res.send({
-          message: "Puntuacion asignada",
-          success: true
+        let sql1=`update clientes set puntuacion=(SELECT AVG(puntuacion_cliente) AS promedio FROM servicios WHERE cliente_id=${id}) where id=${id};`;
+        connectionBD.query(sql1,(error,results)=>{
+          if(error){
+            res.send({
+              success:false
+            })
+          }else{
+            res.send({
+              message: "Puntuacion asignada",
+              success: true
+            })
+          }
         })
       }
     })
@@ -267,10 +276,20 @@ router.put("/rating", auth, async function (req, res, next) {
           success: false
         });
       } else {
-        res.send({
-          message: "Puntuacion asignada",
-          success: true
+        let sql1=`update trabajadores set puntuacion=(SELECT AVG(puntuacion_trabajador) AS promedio FROM servicios WHERE trabajador_id=${id}) where id=${id};`;
+        connectionBD.query(sql1,(error,results)=>{
+          if(error){
+            res.send({
+              success:false
+            })
+          }else{
+            res.send({
+              message: "Puntuacion asignada",
+              success: true
+            })
+          }
         })
+        
       }
     })
   }

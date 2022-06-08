@@ -17,11 +17,12 @@ router.get("/", async function (req, res, next) {});
 
 router.post("/", auth, async function (req, res, next) {
   const { tipoServicio } = req.body;
-
   if(tipoServicio !== null){
+    
     let sql = `SELECT * FROM trabajadores WHERE tipo_servicio='${tipoServicio}'`;
 
     await connectionBD.query(sql, function (error, results) {
+      
       if (error) {
         console.log(error);
       } else {
@@ -31,15 +32,11 @@ router.post("/", auth, async function (req, res, next) {
             succes:false
           })
         }else{
-            console.log(`Enviando cameyadores para ${tipoServicio}`);
-            results.forEach(element => {
-              console.log(element.nombres);
-            });
-            res.send({
-              variable:'Array',
-              data: results,
-              succes:true
-            })
+          res.send({
+            variable:'Array',
+            data: results,
+            succes:true
+          })
         }
       }
     });
@@ -55,10 +52,6 @@ router.post("/", auth, async function (req, res, next) {
             succes:false
           })
         }else{
-            console.log(`Enviando cameyadores`);
-            results.forEach(element => {
-              console.log(element.nombres);
-            });
             res.send({
               variable:'Array',
               data: results,
